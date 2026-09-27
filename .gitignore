@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.env/
+.pytest_cache/
+.coverage
+htmlcov/
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+# FastAPI / local
+*.log
+*.sqlite
+*.mp4
+*.mov
+~$*.pptx
+# Build / caches
+dist/
+build/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+# Keep hackathon evidence - do NOT ignore these:
+# !bob_sessions/
+# !bob-evidence/

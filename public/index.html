@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SlideShift — Free PPT ⇄ PDF Converter (100% in-browser)</title>
+<meta name="description" content="Convert PPTX to PDF and PDF to PPTX free, right in your browser. No signup, no server, files never leave your device." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./styles.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔄</text></svg>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="grid-overlay"></div></div>
+
+<header class="topbar">
+  <div class="brand"><span class="mark">🔄</span><div><b>SlideShift</b><small>free · in-browser · no upload</small></div></div>
+  <div class="top-right">
+    <span class="pill pill-glow" id="enginePill">● checking engines…</span>
+    <button class="icon-btn" id="themeBtn" title="Toggle theme">◐</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <h1>Convert <span class="grad">PPTX ⇄ PDF</span> free.<br>Files never leave your device.</h1>
+    <p class="lede">Everything runs <b>in your browser</b> with JavaScript only — no server, no signup, no database, deployable on <b>Vercel free</b> as a static site. Honest trade-off: this is a <em>content-preserving</em> converter, not a pixel-perfect clone (see limits below).</p>
+    <div class="engine-row" id="engineRow">
+      <span data-eng="pdfjs">PDF engine</span><span data-eng="jszip">ZIP engine</span><span data-eng="jspdf">PDF writer</span><span data-eng="pptxgen">PPTX writer</span>
+    </div>
+  </section>
+
+  <!-- ══ CONVERTER ══ -->
+  <section class="glass card">
+    <div class="tabs">
+      <button class="tab active" data-dir="pptx2pdf">📄 PPTX → PDF</button>
+      <button class="tab" data-dir="pdf2pptx">📊 PDF → PPTX</button>
+    </div>
+
+    <div class="conv-body">
+      <div class="dropzone" id="dropzone">
+        <div class="dz-icon">📁</div>
+        <p><b>Drop your file here</b> or <span class="link">browse</span></p>
+        <p class="muted sm" id="dzHint">Accepts .pptx up to ~100MB</p>
+        <input type="file" id="fileInput" hidden />
+      </div>
+
+      <div class="filebar hidden" id="filebar">
+        <div><b id="fileName">—</b><small class="muted" id="fileMeta">—</small></div>
+        <button class="mini-btn" id="removeFile">✕ remove</button>
+      </div>
+
+      <div class="opts">
+        <div id="opts-pptx2pdf" class="opt-grid">
+          <label>Orientation
+            <select id="pdfOrient"><option value="landscape" selected>Landscape 13.33×7.5″</option><option value="portrait">Portrait 7.5×13.33″</option></select>
+          </label>
+          <label class="check"><input type="checkbox" id="pdfImages" checked /> Include slide images</label>
+          <label>Output name <input type="text" id="pptxOutName" placeholder="auto from input" /></label>
+        </div>
+        <div id="opts-pdf2pptx" class="opt-grid hidden">
+          <label>Render quality
+            <select id="pptxScale"><option value="1.5">Standard (fast)</option><option value="2" selected>High (recommended)</option><option value="3">Ultra (slow, big file)</option></select>
+          </label>
+          <label>Slide size
+            <select id="pptxLayout"><option value="LAYOUT_WIDE" selected>16:9 widescreen</option><option value="LAYOUT_4x3">4:3 standard</option></select>
+          </label>
+          <label>Output name <input type="text" id="pdfOutName" placeholder="auto from input" /></label>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-lg full" id="convertBtn" disabled>Select a file to start</button>
+
+      <div class="progress hidden" id="progressWrap">
+        <div class="bar"><div id="barFill"></div></div>
+        <p class="sm" id="progressText">working…</p>
+      </div>
+      <pre class="code hidden" id="log"></pre>
+
+      <a class="btn btn-ghost btn-lg full hidden" id="downloadBtn" href="#">⬇ Download result</a>
+    </div>
+  </section>
+
+  <!-- ══ HOW / LIMITS ══ -->
+  <section class="grid2">
+    <div class="glass pad">
+      <h3>⚙ How it works</h3>
+      <ol class="steps">
+        <li><b>PDF → PPTX:</b> each PDF page is rendered to an image (PDF.js) and placed full-bleed on its own slide (PptxGenJS). Layout is pixel-faithful; slides are images, not editable text.</li>
+        <li><b>PPTX → PDF:</b> the .pptx (a ZIP of XML) is unzipped in-browser (JSZip); slide text + images are extracted in presentation order and rebuilt as a clean PDF (jsPDF).</li>
+        <li><b>Nothing uploads anywhere.</b> Open DevTools → Network while converting: zero file traffic. That is why it runs on Vercel free forever.</li>
+      </ol>
+    </div>
+    <div class="glass pad">
+      <h3>⚠ Honest limits (Option A)</h3>
+      <ul class="steps">
+        <li>Only modern <code>.pptx</code> — old binary <code>.ppt</code> is not supported.</li>
+        <li>PPTX → PDF keeps text + images, but <b>not</b> exact fonts, animations, transitions, charts, SmartArt or embedded video.</li>
+        <li>PDF → PPTX slides look identical but are <b>images</b> — text isn't selectable/editable.</li>
+        <li>Password-protected PDFs are rejected. Very large files (&gt;100MB) may exhaust browser memory.</li>
+        <li>Need pixel-perfect editable output? That's Option B/C (paid API or LibreOffice backend) — not possible on Vercel free.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer><span>🔄 <b>SlideShift</b> · 100% client-side · your files never leave this tab</span><span class="muted" id="doneCount">0 conversions done</span></footer>
+<div class="toasts" id="toasts"></div>
+
+<script src="./app.js"></script>
+</body>
+</html>

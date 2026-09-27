@@ -1,0 +1,1 @@
+"""FastAPI Workshop application package."""
